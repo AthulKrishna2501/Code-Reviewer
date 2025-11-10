@@ -1,0 +1,19 @@
+{
+  "name": "code-review-app",
+  "version": "1.0.0",
+  "description": "AI-powered code review application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "client": "cd frontend && npm start",
+    "install-client": "cd frontend && npm install",
+    "install-server": "cd backend && npm install",
+    "install-all": "npm run install-server && npm run install-client",
+    "build": "cd frontend && npm run build",
+    "heroku-postbuild": "npm run install-client && npm run build"
+  },
+  "keywords": ["code", "review", "ai", "javascript", "python", "java", "go"],
+  "author": "Code Review AI",
+  "license": "MIT"
+}
