@@ -16,7 +16,9 @@ app.use('/api', codeReviewRoutes);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
+  // Print where it's looking for the build
+  console.log('Serving frontend from:', path.join(__dirname, '../frontend/build'));
+
   app.use(express.static(path.join(__dirname, '../frontend/build')));
 
   app.get('*', (req, res) => {
