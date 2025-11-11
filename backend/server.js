@@ -6,6 +6,15 @@ const codeReviewRoutes = require('./routes/codeReview');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// Ensure working directory is project root so frontend/build can be found
+try {
+  const projectRoot = path.join(__dirname, '..');
+  process.chdir(projectRoot);
+  console.log('Changed working directory to project root:', process.cwd());
+} catch (err) {
+  console.warn('Could not change working directory:', err.message);
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
