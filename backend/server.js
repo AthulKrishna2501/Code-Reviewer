@@ -15,26 +15,65 @@ app.use(express.static('public'));
 app.use('/api', codeReviewRoutes);
 
 // Serve static assets
-const buildPath = path.join(__dirname, '../frontend/build');
 const fs = require('fs');
 
-console.log('Current directory:', __dirname);
-console.log('Serving frontend from:', buildPath);
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('Build path exists:', fs.existsSync(buildPath));
-console.log('index.html exists:', fs.existsSync(path.join(buildPath, 'index.html')));
+// Try multiple possible build paths
+const possiblePaths = [
+  path.join(__dirname, '../frontend/build'),
+  path.join(__dirname, '../../frontend/build'),
+  path.join(process.cwd(), 'frontend/build'),
+];
 
-// List directory contents for debugging
-if (fs.existsSync(buildPath)) {
-  console.log('Build directory contents:', fs.readdirSync(buildPath));
-} else {
-  console.warn('⚠️  WARNING: Build directory does not exist at', buildPath);
+let buildPath = null;
+for (const p of possiblePaths) {
+  if (fs.existsSync(p)) {
+    buildPath = p;
+    break;
+  }
 }
 
-app.use(express.static(buildPath));
+console.log('Current working directory:', process.cwd());
+console.log('__dirname:', __dirname);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('Checked paths:', possiblePaths);
+console.log('Build path found:', buildPath);
+
+if (!buildPath) {
+  console.warn('⚠️  WARNING: No build directory found in any expected location!');
+  console.warn('Expected locations:');
+  possiblePaths.forEach(p => console.warn('  - ', p));
+  
+  // List parent directory contents for debugging
+  const parentDir = path.join(__dirname, '..');
+  if (fs.existsSync(parentDir)) {
+    console.log('Contents of', parentDir, ':', fs.readdirSync(parentDir));
+  }
+  
+  // If on render, list root directory
+  if (fs.existsSync('/opt/render/project')) {
+    console.log('Contents of /opt/render/project:', fs.readdirSync('/opt/render/project'));
+    if (fs.existsSync('/opt/render/project/src')) {
+      console.log('Contents of /opt/render/project/src:', fs.readdirSync('/opt/render/project/src'));
+    }
+  }
+} else {
+  console.log('✓ Build directory found at:', buildPath);
+  if (fs.existsSync(path.join(buildPath, 'index.html'))) {
+    console.log('✓ index.html exists');
+  }
+  console.log('Build directory contents:', fs.readdirSync(buildPath));
+}
+
+if (buildPath) {
+  app.use(express.static(buildPath));
+}
 
 // Fallback to index.html for client-side routing
 app.get('*', (req, res) => {
+  if (!buildPath) {
+    return res.status(500).send('Build directory not found. Please check server logs.');
+  }
+  
   const indexPath = path.resolve(buildPath, 'index.html');
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
