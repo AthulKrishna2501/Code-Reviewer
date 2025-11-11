@@ -43,6 +43,7 @@ if (fs.existsSync(buildPath)) {
   console.log('✓ Static file serving configured');
 } else {
   console.warn('⚠️  Static file serving NOT configured - build directory missing');
+  console.log('CWD contents:', fs.readdirSync(process.cwd()));
 }
 
 // Fallback to index.html for client-side routing

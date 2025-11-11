@@ -4,4 +4,4 @@ services:
     env: node
     plan: free
     buildCommand: chmod +x .render-build.sh && ./.render-build.sh
-    startCommand: NODE_ENV=production npm start
+    startCommand: cd /opt/render/project/src && NODE_ENV=production npm start
