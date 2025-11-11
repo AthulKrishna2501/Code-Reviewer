@@ -1,31 +1,32 @@
 #!/bin/bash
-set -e
 
 echo "=== Starting Render Build Process ==="
 echo "Current directory: $(pwd)"
 echo "Node version: $(node --version)"
 echo "npm version: $(npm --version)"
 
+set -e
+
 echo ""
 echo "=== Installing root dependencies ==="
-npm ci
+npm install
 
 echo ""
 echo "=== Installing backend dependencies ==="
-npm ci --prefix backend
+cd backend && npm install && cd ..
 
 echo ""
 echo "=== Installing frontend dependencies ==="
-npm ci --prefix frontend
+cd frontend && npm install && cd ..
 
 echo ""
 echo "=== Building frontend ==="
-npm run build --prefix frontend
+cd frontend && npm run build && cd ..
 
 echo ""
 echo "=== Build Complete ==="
 echo "Checking build output:"
-ls -la frontend/build/ 2>/dev/null || echo "ERROR: Build directory not found!"
+ls -la frontend/build/ || echo "ERROR: Build directory not found!"
 
 if [ ! -f "frontend/build/index.html" ]; then
   echo "ERROR: index.html not found in build directory!"
@@ -33,3 +34,4 @@ if [ ! -f "frontend/build/index.html" ]; then
 fi
 
 echo "SUCCESS: Frontend built successfully!"
+ls -la frontend/build/index.html

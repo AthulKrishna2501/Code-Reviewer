@@ -3,5 +3,5 @@ services:
     name: code-review-app
     env: node
     plan: free
-    buildCommand: npm install && npm install --prefix frontend && npm run build --prefix frontend
+    buildCommand: chmod +x .render-build.sh && ./.render-build.sh
     startCommand: NODE_ENV=production npm start
