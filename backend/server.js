@@ -14,17 +14,17 @@ app.use(express.static('public'));
 // Routes
 app.use('/api', codeReviewRoutes);
 
-// Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
-  // Print where it's looking for the build
-  console.log('Serving frontend from:', path.join(__dirname, '../frontend/build'));
+// Serve static assets
+const buildPath = path.join(__dirname, '../frontend/build');
+console.log('Serving frontend from:', buildPath);
+console.log('NODE_ENV:', process.env.NODE_ENV);
 
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.use(express.static(buildPath));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
-  });
-}
+// Fallback to index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(buildPath, 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
