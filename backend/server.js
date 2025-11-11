@@ -16,14 +16,32 @@ app.use('/api', codeReviewRoutes);
 
 // Serve static assets
 const buildPath = path.join(__dirname, '../frontend/build');
+const fs = require('fs');
+
+console.log('Current directory:', __dirname);
 console.log('Serving frontend from:', buildPath);
 console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('Build path exists:', fs.existsSync(buildPath));
+console.log('index.html exists:', fs.existsSync(path.join(buildPath, 'index.html')));
+
+// List directory contents for debugging
+if (fs.existsSync(buildPath)) {
+  console.log('Build directory contents:', fs.readdirSync(buildPath));
+} else {
+  console.warn('⚠️  WARNING: Build directory does not exist at', buildPath);
+}
 
 app.use(express.static(buildPath));
 
 // Fallback to index.html for client-side routing
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(buildPath, 'index.html'));
+  const indexPath = path.resolve(buildPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error('index.html not found at:', indexPath);
+    res.status(404).send('index.html not found. Build directory may not exist.');
+  }
 });
 
 app.listen(PORT, () => {
